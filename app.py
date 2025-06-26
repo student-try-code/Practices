@@ -692,3 +692,43 @@ if st.sidebar.button("📦 Xuất Excel"):
         file_name="de_on_tap_da_sua.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+# ===============================
+# --- PHẦN ZIP HÌNH ẢNH ---
+# ===============================
+import zipfile
+import shutil
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📸 Tải lên & tải về thư mục ảnh")
+
+# --- TẢI LÊN FILE ZIP ---
+uploaded_zip = st.sidebar.file_uploader("📁 Tải lên thư mục ảnh (.zip)", type=["zip"], key="upload_zip_images")
+if uploaded_zip is not None:
+    try:
+        # Giải nén vào thư mục ảnh
+        with zipfile.ZipFile(uploaded_zip, 'r') as zip_ref:
+            zip_ref.extractall(image_folder)
+        st.sidebar.success("✅ Đã giải nén ảnh vào thư mục `images/`")
+    except Exception as e:
+        st.sidebar.error(f"❌ Lỗi giải nén: {str(e)}")
+
+# --- NÉN THƯ MỤC ẢNH ĐỂ TẢI VỀ ---
+if os.path.exists(image_folder) and len(os.listdir(image_folder)) > 0:
+    if st.sidebar.button("📦 Tải về thư mục ảnh (.zip)"):
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(image_folder):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, image_folder)
+                    zipf.write(file_path, arcname)
+        zip_buffer.seek(0)
+
+        st.sidebar.download_button(
+            label="⬇️ Tải thư mục ảnh",
+            data=zip_buffer,
+            file_name="thu_muc_anh.zip",
+            mime="application/zip"
+        )
+else:
+    st.sidebar.info("📂 Thư mục `images/` đang trống hoặc chưa có ảnh.")
