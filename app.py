@@ -116,20 +116,20 @@ excel_file = uploaded_file  # dùng file upload
 
 
 # Kiểm tra file hợp lệ
-if not excel_path:
+if not excel_file:
     st.warning("⚠️ Vui lòng nhập đường dẫn file Excel.")
     st.stop()
 
-if not excel_path.endswith('.xlsx'):
+if not excel_file.endswith('.xlsx'):
     st.error("❌ File phải có định dạng .xlsx")
     st.stop()
 
-if not os.path.isfile(excel_path):
-    st.error(f"⛔ Không tìm thấy file tại: {excel_path}")
+if not os.path.isfile(excel_file):
+    st.error(f"⛔ Không tìm thấy file tại: {excel_file}")
     st.stop()
 
 # Thiết lập đường dẫn
-excel_file = excel_path
+excel_file = excel_file
 image_folder = os.path.join(os.path.dirname(excel_file), "images")
 
 # Kiểm tra thư mục hình ảnh
