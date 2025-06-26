@@ -693,42 +693,21 @@ if st.sidebar.button("📦 Xuất Excel"):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 # ===============================
-# --- PHẦN ZIP HÌNH ẢNH ---
+# --- PHẦN UPLOAD NHIỀU ẢNH ---
 # ===============================
-import zipfile
-import shutil
-
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 📸 Tải lên & tải về thư mục ảnh")
+st.sidebar.markdown("### 📸 Tải lên nhiều hình ảnh")
 
-# --- TẢI LÊN FILE ZIP ---
-uploaded_zip = st.sidebar.file_uploader("📁 Tải lên thư mục ảnh (.zip)", type=["zip"], key="upload_zip_images")
-if uploaded_zip is not None:
-    try:
-        # Giải nén vào thư mục ảnh
-        with zipfile.ZipFile(uploaded_zip, 'r') as zip_ref:
-            zip_ref.extractall(image_folder)
-        st.sidebar.success("✅ Đã giải nén ảnh vào thư mục `images/`")
-    except Exception as e:
-        st.sidebar.error(f"❌ Lỗi giải nén: {str(e)}")
+uploaded_images = st.sidebar.file_uploader(
+    "📁 Chọn nhiều ảnh (PNG, JPG, JPEG)",
+    type=["png", "jpg", "jpeg"],
+    accept_multiple_files=True,
+    key="upload_multiple_images"
+)
 
-# --- NÉN THƯ MỤC ẢNH ĐỂ TẢI VỀ ---
-if os.path.exists(image_folder) and len(os.listdir(image_folder)) > 0:
-    if st.sidebar.button("📦 Tải về thư mục ảnh (.zip)"):
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(image_folder):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, image_folder)
-                    zipf.write(file_path, arcname)
-        zip_buffer.seek(0)
-
-        st.sidebar.download_button(
-            label="⬇️ Tải thư mục ảnh",
-            data=zip_buffer,
-            file_name="thu_muc_anh.zip",
-            mime="application/zip"
-        )
-else:
-    st.sidebar.info("📂 Thư mục `images/` đang trống hoặc chưa có ảnh.")
+if uploaded_images:
+    for file in uploaded_images:
+        save_path = os.path.join(image_folder, file.name)
+        with open(save_path, "wb") as f:
+            f.write(file.read())
+    st.sidebar.success(f"✅ Đã tải lên {len(uploaded_images)} ảnh vào thư mục `images/`")
