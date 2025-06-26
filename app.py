@@ -15,8 +15,6 @@ from PIL import Image, ImageGrab
 import io
 import base64
 import pyperclip
-import zipfile
-import tempfile
 
 
 @st.cache_data(ttl=0)
@@ -104,33 +102,28 @@ def display_note_with_images(note_text, image_folder):
             st.write(line)
 
 
-# --- PHẦN NHẬP ĐƯỜNG DẪN FILE EXCEL ---
+# --- PHẦN UPLOAD FILE EXCEL ---
+import tempfile
+
 st.sidebar.title("Tuỳ chọn")
+
 uploaded_file = st.sidebar.file_uploader("📁 Tải lên file Excel (.xlsx)", type=["xlsx"])
 
 if uploaded_file is None:
     st.warning("⚠️ Vui lòng tải lên file Excel.")
     st.stop()
 
-excel_file = uploaded_file  # dùng file upload
+# Lưu file Excel vào thư mục tạm để có thể ghi lại được
+temp_dir = tempfile.TemporaryDirectory()
+excel_file = os.path.join(temp_dir.name, "uploaded.xlsx")
 
+with open(excel_file, "wb") as f:
+    f.write(uploaded_file.read())
 
-# Kiểm tra file hợp lệ
-if not excel_file:
-    st.warning("⚠️ Vui lòng nhập đường dẫn file Excel.")
-    st.stop()
+# Tạo thư mục ảnh tạm (images)
+image_folder = os.path.join(temp_dir.name, "images")
+os.makedirs(image_folder, exist_ok=True)
 
-if not excel_file.endswith('.xlsx'):
-    st.error("❌ File phải có định dạng .xlsx")
-    st.stop()
-
-if not os.path.isfile(excel_file):
-    st.error(f"⛔ Không tìm thấy file tại: {excel_file}")
-    st.stop()
-
-# Thiết lập đường dẫn
-excel_file = excel_file
-image_folder = os.path.join(os.path.dirname(excel_file), "images")
 
 # Kiểm tra thư mục hình ảnh
 if not os.path.exists(image_folder):
@@ -680,6 +673,9 @@ for i, q in enumerate(questions):
                     st.success("Đã lưu ghi chú.")
                     st.rerun()
 
+# --- PHẦN TẢI FILE EXCEL ĐÃ CHỈNH SỬA ---
+import io
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📥 Tải file Excel đã chỉnh sửa")
 
@@ -691,7 +687,7 @@ if st.sidebar.button("📦 Xuất Excel"):
     output.seek(0)
 
     st.sidebar.download_button(
-        label="⬇️ Tải xuống file",
+        label="⬇️ Tải file mới",
         data=output,
         file_name="de_on_tap_da_sua.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
