@@ -121,8 +121,8 @@ with open(excel_file, "wb") as f:
     f.write(uploaded_file.read())
 
 # Tạo thư mục ảnh tạm (images)
-image_folder = os.path.join(temp_dir.name, "images")
-os.makedirs(image_folder, exist_ok=True)
+image_folder = "images"
+# os.makedirs(image_folder, exist_ok=True)
 
 
 # Kiểm tra thư mục hình ảnh
