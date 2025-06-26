@@ -15,6 +15,8 @@ from PIL import Image, ImageGrab
 import io
 import base64
 import pyperclip
+import zipfile
+import tempfile
 
 
 @st.cache_data(ttl=0)
@@ -104,9 +106,14 @@ def display_note_with_images(note_text, image_folder):
 
 # --- PHẦN NHẬP ĐƯỜNG DẪN FILE EXCEL ---
 st.sidebar.title("Tuỳ chọn")
-excel_path = st.sidebar.text_input(
-    "📁 Dán đường dẫn file Excel (.xlsx):",
-    help="Ví dụ: C:/Users/name/Documents/ngan_hang_cau_hoi.xlsx"
+uploaded_file = st.sidebar.file_uploader("📁 Tải lên file Excel (.xlsx)", type=["xlsx"])
+
+if uploaded_file is None:
+    st.warning("⚠️ Vui lòng tải lên file Excel.")
+    st.stop()
+
+excel_file = uploaded_file  # dùng file upload
+
 )
 
 # Kiểm tra file hợp lệ
@@ -673,3 +680,20 @@ for i, q in enumerate(questions):
                     st.session_state[f"{row_id}_edit_note"] = False
                     st.success("Đã lưu ghi chú.")
                     st.rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📥 Tải file Excel đã chỉnh sửa")
+
+if st.sidebar.button("📦 Xuất Excel"):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        for sheet_name, df in all_sheets.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+    output.seek(0)
+
+    st.sidebar.download_button(
+        label="⬇️ Tải xuống file",
+        data=output,
+        file_name="de_on_tap_da_sua.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
