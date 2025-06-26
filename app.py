@@ -692,22 +692,3 @@ if st.sidebar.button("📦 Xuất Excel"):
         file_name="de_on_tap_da_sua.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-# ===============================
-# --- PHẦN UPLOAD NHIỀU ẢNH ---
-# ===============================
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📸 Tải lên nhiều hình ảnh")
-
-uploaded_images = st.sidebar.file_uploader(
-    "📁 Chọn nhiều ảnh (PNG, JPG, JPEG)",
-    type=["png", "jpg", "jpeg"],
-    accept_multiple_files=True,
-    key="upload_multiple_images"
-)
-
-if uploaded_images:
-    for file in uploaded_images:
-        save_path = os.path.join(image_folder, file.name)
-        with open(save_path, "wb") as f:
-            f.write(file.read())
-    st.sidebar.success(f"✅ Đã tải lên {len(uploaded_images)} ảnh vào thư mục `images/`")
