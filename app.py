@@ -114,7 +114,6 @@ if uploaded_file is None:
 
 excel_file = uploaded_file  # dùng file upload
 
-)
 
 # Kiểm tra file hợp lệ
 if not excel_path:
